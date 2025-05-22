@@ -1,0 +1,21 @@
+:root {
+  --primary-color: #6c63ff;
+  --accent-color: #9f7aea;
+  --dark-color: #4b3f72;
+  --correct-color: #38a169;
+  --incorrect-color: #e53e3e;
+  --light-bg: #f7f9fc;
+  --card-bg: rgba(255, 255, 255, 0.8);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--light-bg), #e4e9f2);
+  min-height: 100vh;
+} 
