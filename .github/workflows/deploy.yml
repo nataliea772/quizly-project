@@ -20,16 +20,20 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
           cat >>~/.ssh/config <<END
           Host ec2
             HostName $SSH_HOST
             User ubuntu
             IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
+            StrictHostKeyChecking accept-new
           END
 
       - name: Upload systemd service file to EC2
-        run: scp -i ~/.ssh/deploy_key ./quizly.service ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/
+        env:
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key ./quizly.service ubuntu@$SSH_HOST:/home/ubuntu/
 
       - name: Deploy frontend to EC2
         uses: appleboy/ssh-action@v1.0.3
