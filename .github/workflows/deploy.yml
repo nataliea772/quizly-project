@@ -12,25 +12,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Configure SSH
-        env:
-          SSH_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.EC2_HOST }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/deploy_key
-          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
-
       - name: Upload systemd service file to EC2
-        env:
-          SSH_HOST: ${{ secrets.EC2_HOST }}
-          SSH_USER: ${{ secrets.EC2_USER }}
-        run: |
-          scp -v -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key ./quizly.service "$SSH_USER@$SSH_HOST:/home/$SSH_USER/"
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          source: "quizly.service"
+          target: "/home/ubuntu"
+          strip_components: 0
+          timeout: "30s"
+          command_timeout: "30s"
+          debug: true
 
       - name: Deploy frontend to EC2
         uses: appleboy/ssh-action@v1.0.3
