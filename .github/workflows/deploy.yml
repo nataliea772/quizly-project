@@ -32,6 +32,11 @@ jobs:
     - name: Build project
       run: npm run build
 
+    - name: Test EC2 Connection
+      run: |
+        echo "Testing connection to EC2..."
+        nc -zv ${{ secrets.EC2_HOST }} 22 -w 5 || echo "Connection failed"
+
     - name: Deploy to EC2
       uses: easingthemes/ssh-deploy@v4.1.8
       env:
@@ -40,8 +45,11 @@ jobs:
         REMOTE_USER: ubuntu
         SOURCE: "out/ server.js package.json package-lock.json nginx.conf"
         TARGET: /home/ubuntu/quizapp
+        ARGS: "-rltgoDzvO --delete"
+        SSH_CMD_ARGS: "-o ConnectTimeout=10"
 
     - name: Configure Server
+      if: success()
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_HOST }}
