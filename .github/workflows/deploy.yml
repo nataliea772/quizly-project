@@ -32,65 +32,23 @@ jobs:
     - name: Build project
       run: npm run build
 
-    - name: Create deployment package
+    - name: Setup SSH
       run: |
-        tar -czf deploy.tar.gz out/ server.js package.json package-lock.json nginx.conf
-        ls -la deploy.tar.gz
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/key
+        chmod 600 ~/.ssh/key
+        echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" > ~/.ssh/config
 
     - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: 'ubuntu'
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        port: 22
-        script: |
-          # Create deployment directory if it doesn't exist
-          mkdir -p /home/ubuntu/quizapp
-          
-          # Install Node.js if not installed
-          if ! command -v node &> /dev/null; then
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-          fi
-
-          # Install Nginx if not installed
-          if ! command -v nginx &> /dev/null; then
-            sudo apt-get update
-            sudo apt-get install -y nginx
-          fi
-
-          # Install PM2 if not installed
-          if ! command -v pm2 &> /dev/null; then
-            sudo npm install -g pm2
-          fi
-
-    - name: Copy files to EC2
-      uses: appleboy/ssh-action@v1.0.0
-      env:
-        DEPLOY_PACKAGE: deploy.tar.gz
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: 'ubuntu'
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        port: 22
-        script_stop: true
-        envs: DEPLOY_PACKAGE
-        script: |
-          # Clean and prepare directory
-          cd /home/ubuntu/quizapp
-          rm -rf out/ server.js package.json package-lock.json nginx.conf
-          
-          # Extract deployment package
-          tar xzf $DEPLOY_PACKAGE
-          
-          # Setup Nginx configuration
-          sudo cp nginx.conf /etc/nginx/sites-available/quizapp
-          sudo ln -sf /etc/nginx/sites-available/quizapp /etc/nginx/sites-enabled/
-          sudo rm -f /etc/nginx/sites-enabled/default
-          sudo nginx -t && sudo systemctl restart nginx
-
-          # Install dependencies and start application
-          npm install
-          pm2 restart quizapp || pm2 start server.js --name quizapp
+      run: |
+        rsync -avz -e "ssh -i ~/.ssh/key" out/ server.js package.json package-lock.json nginx.conf ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/quizapp/
+        ssh -i ~/.ssh/key ubuntu@${{ secrets.EC2_HOST }} '
+          cd /home/ubuntu/quizapp &&
+          npm install &&
+          sudo cp nginx.conf /etc/nginx/sites-available/quizapp &&
+          sudo ln -sf /etc/nginx/sites-available/quizapp /etc/nginx/sites-enabled/ &&
+          sudo rm -f /etc/nginx/sites-enabled/default &&
+          sudo nginx -t && sudo systemctl restart nginx &&
+          pm2 restart quizapp || pm2 start server.js --name quizapp &&
           pm2 save
+        '
