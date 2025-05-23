@@ -5,25 +5,16 @@ on:
     branches:
       - main  # or your main deployment branch
 
-permissions:
-  contents: read
-  actions: write
-
 jobs:
   deploy:
     name: Deploy to EC2 Instance
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Configure Git
+    - name: Manual Checkout
       run: |
-        git config --global url."https://${{ secrets.PAT_TOKEN }}@github.com/".insteadOf "https://github.com/"
-
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.PAT_TOKEN }}
+        git clone https://oauth2:${{ secrets.PAT_TOKEN }}@github.com/nataliea772/quizly-project.git .
+        git checkout main
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
