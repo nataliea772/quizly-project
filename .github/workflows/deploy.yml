@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.PAT_TOKEN }}  # Use the personal access token for authentication
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
