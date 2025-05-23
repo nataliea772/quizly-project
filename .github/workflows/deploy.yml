@@ -17,23 +17,20 @@ jobs:
           SSH_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
-          cat >>~/.ssh/config <<END
-          Host ec2
-            HostName $SSH_HOST
-            User ubuntu
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking accept-new
-          END
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/deploy_key
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Upload systemd service file to EC2
         env:
           SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER }}
         run: |
-          scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key ./quizly.service ubuntu@$SSH_HOST:/home/ubuntu/
+          scp -v -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key ./quizly.service "$SSH_USER@$SSH_HOST:/home/$SSH_USER/"
 
       - name: Deploy frontend to EC2
         uses: appleboy/ssh-action@v1.0.3
