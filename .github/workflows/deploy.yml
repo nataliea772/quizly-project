@@ -5,6 +5,11 @@ on:
     branches:
       - main  # or your main deployment branch
 
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+
 jobs:
   deploy:
     name: Deploy to EC2 Instance
