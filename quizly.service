@@ -1,0 +1,14 @@
+[Unit]
+Description=Activity Suggestion Frontend (React) Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/webapp-instance-natalie
+ExecStart=/usr/bin/serve -s dist -l 3000
+Restart=always
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
