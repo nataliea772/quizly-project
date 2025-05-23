@@ -7,10 +7,19 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Debug SSH Key
+        run: |
+          if [ -n "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "SSH key is set"
+          else
+            echo "SSH key is not set"
+          fi
 
       - name: Upload systemd service file to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -21,6 +30,7 @@ jobs:
           source: "./quizly.service"
           target: "/home/ubuntu/"
           strip_components: 0
+          debug: true
 
       - name: Deploy frontend to EC2
         uses: appleboy/ssh-action@v1.0.3
