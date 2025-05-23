@@ -1,12 +1,12 @@
 [Unit]
-Description=Activity Suggestion Frontend (React) Web Service
+Description=Quizly Frontend Service
 After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/webapp-instance-natalie
-ExecStart=/usr/bin/serve -s dist -l 3000
+WorkingDirectory=/home/ubuntu/quizly-frontend
+ExecStart=/usr/bin/serve -s build -l 3000
 Restart=always
 Environment=NODE_ENV=production
 

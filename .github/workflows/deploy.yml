@@ -17,24 +17,21 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          source: "quizly.service"
-          target: "/home/ubuntu"
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "./quizly.service"
+          target: "/home/ubuntu/"
           strip_components: 0
-          timeout: "30s"
-          command_timeout: "30s"
-          debug: true
 
       - name: Deploy frontend to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
 
-            APP_DIR="/home/ubuntu/webapp-instance-natalie"
+            APP_DIR="/home/ubuntu/quizly-frontend"
             REPO_URL="https://github.com/nataliea772/quizly-project.git"
             SERVICE_FILE="/etc/systemd/system/quizly.service"
             LOCAL_TMP_FILE="/home/ubuntu/quizly.service"
@@ -54,7 +51,6 @@ jobs:
               curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
               sudo apt-get install -y nodejs
             fi
-
             sudo npm install -g serve
 
             echo "📦 Installing dependencies and building..."
@@ -72,7 +68,7 @@ jobs:
 
             echo "🔁 Reloading and restarting systemd service..."
             sudo systemctl daemon-reload
-            sudo systemctl enable activity-frontend-web
-            sudo systemctl restart activity-frontend-web
+            sudo systemctl enable quizly
+            sudo systemctl restart quizly
 
             echo "✅ Deployment complete"
