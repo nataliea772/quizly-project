@@ -1,17 +1,18 @@
-const express = require('express');
-const path = require('path');
+const { createServer } = require('http');
+const { parse } = require('url');
+const next = require('next');
 
-const app = express();
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
 
-// Serve static files from the 'out' directory
-app.use(express.static(path.join(__dirname, 'out')));
-
-// Handle all routes by serving index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'out', 'index.html'));
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.prepare().then(() => {
+  createServer((req, res) => {
+    const parsedUrl = parse(req.url, true);
+    handle(req, res, parsedUrl);
+  }).listen(port, '0.0.0.0', (err) => {
+    if (err) throw err;
+    console.log(`> Ready on http://0.0.0.0:${port}`);
+  });
 }); 
