@@ -35,7 +35,7 @@ Note: Mark the correct answer with an asterisk (*) at the end of the option.
 Do not include any introductory text or numbering.
 Provide exactly 5 questions with 4 options each.`;
 
-    const response = await fetch('http://54.183.235.25:11434/api/generate', {
+    const response = await fetch('http://10.0.3.65:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

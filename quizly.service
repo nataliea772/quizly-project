@@ -7,8 +7,10 @@ Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/quizly-frontend
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/serve -s dist -l 3000
+Environment=PORT=3000
+ExecStart=/usr/bin/npm start
 Restart=always
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target

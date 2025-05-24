@@ -65,9 +65,8 @@ jobs:
             echo "📦 Installing dependencies..."
             npm install
 
-            echo "🏗 Building and exporting..."
+            echo "🏗 Building application..."
             npm run build
-            npm run export
 
             echo "🛠 Checking if .service file exists on EC2..."
             if [ ! -f "$LOCAL_TMP_FILE" ]; then
@@ -77,10 +76,15 @@ jobs:
 
             echo "🛠 Installing systemd service file..."
             sudo cp "$LOCAL_TMP_FILE" "$SERVICE_FILE"
+            sudo chown root:root "$SERVICE_FILE"
+            sudo chmod 644 "$SERVICE_FILE"
 
             echo "🔁 Reloading and restarting systemd service..."
             sudo systemctl daemon-reload
             sudo systemctl enable quizly
             sudo systemctl restart quizly
 
+            echo "📝 Checking service status..."
+            sudo systemctl status quizly --no-pager
+            
             echo "✅ Deployment complete"
