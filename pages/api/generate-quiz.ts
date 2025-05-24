@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import fetch from 'node-fetch';
 
 interface QuizQuestion {
   question: string;
@@ -34,15 +35,19 @@ Note: Mark the correct answer with an asterisk (*) at the end of the option.
 Do not include any introductory text or numbering.
 Provide exactly 5 questions with 4 options each.`;
 
-    const response = await fetch('http://52.53.152.100:11434/api/generate', {
+    const response = await fetch('http://127.0.0.1:11434/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3:1b',
+        model: 'gemma:2b',
         prompt,
         stream: false,
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`Ollama request failed: ${response.statusText}`);
+    }
 
     const data = await response.json();
     console.log('Ollama response:', data);
@@ -100,7 +105,7 @@ Provide exactly 5 questions with 4 options each.`;
         .map(([key]) => key);
 
       if (missingOptions.length > 0) {
-        throw new Error(`Missing options ${missingOptions.join(', ')} for question: ${question}`);
+        throw new Error(`Missing options ${missingOptions.length} for question: ${question}`);
       }
 
       // If still no correct answer found, use the first option as fallback
