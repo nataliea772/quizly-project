@@ -51,7 +51,8 @@ jobs:
               git clone $REPO_URL $APP_DIR
             else
               cd $APP_DIR
-              git pull origin main
+              git fetch origin main
+              git reset --hard origin/main
             fi
 
             cd $APP_DIR
@@ -63,6 +64,7 @@ jobs:
             fi
 
             echo "📦 Installing dependencies..."
+            rm -f package-lock.json
             npm install
 
             echo "🏗 Building application..."
