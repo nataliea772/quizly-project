@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #0e0e11;
 }
 
 .main {
@@ -15,8 +15,10 @@
   line-height: 1.15;
   font-size: 3rem;
   text-align: center;
-  color: #2d3748;
+  color: #c084fc;
   margin-bottom: 2rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
 }
 
 @media (max-width: 640px) {
