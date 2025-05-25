@@ -13,7 +13,7 @@ An AI-powered quiz application that generates questions based on any topic and e
 ## Prerequisites
 
 - Node.js 14.x or higher
-- Access to an Ollama instance running at http://52.53.152.100:11434
+- Access to an Ollama instance running at http://54.215.209.227:11434
 
 ## Setup
 

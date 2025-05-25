@@ -47,7 +47,7 @@ jobs:
             LOCAL_TMP_FILE="/home/ubuntu/quizly.service"
 
             echo "🔍 Testing Ollama connectivity..."
-            curl -v http://54.153.118.224:11434/api/generate -d '{"model": "gemma:2b", "prompt": "test", "stream": false}'
+            curl -v http://10.0.3.65:11434/api/generate -d '{"model": "gemma:2b", "prompt": "test", "stream": false}'
 
             echo "📦 Cloning or updating repo..."
             if [ ! -d "$APP_DIR/.git" ]; then
