@@ -105,7 +105,7 @@ export default function Quiz() {
 
   return (
     <div className={styles.quiz}>
-      <h1 className={styles.title}>Quiz Bot</h1>
+      <h1 className={styles.title}>Quiz Bot - Demo</h1>
 
       <div className={styles.inputSection}>
         <input
